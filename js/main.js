@@ -33,7 +33,7 @@ info.update = function (props) {
 	"<tr><td>Total votes: </td><td>"+props.USPRSTOTAL+"</td></tr></table>" : "Hover over a precinct to see vote counts");
 };
 
-info.addTo(map);
+//info.addTo(map);
 
 ///////////////////////////////////////////////////////////////////////////////
 // ADDING AND SYMBOLIZING GEOJSON
@@ -159,6 +159,17 @@ request.then(function(values){
   	// https://leafletjs.com/reference-1.3.4.html#map-click
   	// and the lat/long that is a part of mouse events here:
   	// https://leafletjs.com/reference-1.3.4.html#mouseevent-latlng
+    
+    
+    // event handler for map hover
+    // displays latitude and longitude of mouse cursor
+    function mapHoverHandler(e) {
+        
+        coords.update(e.latlng);
+    }
+    
+    // apply hover handler to hover event
+    map.on('mousemove', mapHoverHandler);
 
   	// more hints:
   	//  - first, create an event handler that will take the lat / long
@@ -170,3 +181,28 @@ request.then(function(values){
   	//    should help)
 
 });
+
+///////////////////////////////////////////////////////////////////////////////
+// COORDS CONTROL
+// This will display the coordinates of the mouse cursor
+var coords = L.control();
+
+coords.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'coords'); // create a div with a class "coords"
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+coords.update = function (props) {
+    this._div.innerHTML =
+    (props ? 
+     "<p><strong>Latitude:</strong> &nbsp&nbsp"+props.lat.toFixed(10)+"</p>"+
+	"<p><strong>Longitude:</strong> "+props.lng.toFixed(10)+"</p>" : 
+    "<p><strong>Latitude:</strong> &nbsp&nbsp46.7300000000</p>"+
+	"<p><strong>Longitude:</strong> -92.1070000000</p>");
+};
+
+// add controls to map
+coords.addTo(map);
+info.addTo(map);
